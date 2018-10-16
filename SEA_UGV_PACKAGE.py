@@ -8,23 +8,9 @@ import pandas as pd #библиотека для работы с бд
 import numpy as np #матбиблиотека
 from shapely.geometry import Polygon
 import sys
+import os
 sys.setrecursionlimit(100000)
-quality=[]
-num=0
-f1=open('COS-TEST-1-in.csv','r')
-f2=open('Output.csv','w')
-s=f1.readlines()
-print(s[1][:len(s[1])-1],file=f2)
-for line in np.arange(2,len(s),1):
-    print(s[line][:len(s[line])-2],file=f2)
-f1.close()
-f2.close()
-L=1200
-W=800
-wtf=0
-queue=[]
-lvl=[]
-prlvl=[]
+
 def maxheight():
     global data
     z=[]
@@ -161,25 +147,44 @@ def place(x,y,z):
         queue.clear()
         return
     return
-data=[]
-used=[]
-dfc=pd.read_csv('Output.csv')
-dfc.sort_values(by="Height",inplace=True,ascending=False)
-for i in range(dfc['SKU'].count()):
-    for j in range(dfc['Quantity'].iloc[i]-1):
-        if (j>0): dfc.append(dfc.iloc[i])
-j=dfc['SKU'].count()-1
-i=0
-dfc = dfc.assign(Surface=pd.Series(dfc['Length']*dfc['Width']))
-dfc = dfc.assign(Volume=pd.Series(dfc['Length']*dfc['Width']*dfc['Height']))
-volume=dfc['Volume'].sum()
-dfc.sort_values(by="Height",inplace=True,ascending=False)
-for i in range(dfc['SKU'].count()):
-    used.append(-1)
-    data.append([[0,0,0],[0,0,0]])
-place(0,0,0)
-f3=open('COS-TEST-1-out.csv','w')
-for i in range(len(used)):
-    print(dfc['SKU'].iloc[i],data[i][0][0],data[i][0][1],data[i][0][2],data[i][1][0],data[i][1][1],data[i][1][2],dfc['Aisle'].iloc[i],dfc['Mass'].iloc[i],sep=",",file=f3)
-f3.close()
+files = os.listdir('./')
+for num in range(1, len(files)-1):
+    try:
+        quality=[]
+        num=0
+        f1=open('COS-TEST-{0}-in.csv'.format(num),'r')
+        f2=open('Output.csv','w')
+        s=f1.readlines()
+        print(s[1][:len(s[1])-1],file=f2)
+        for line in np.arange(2,len(s),1):
+            print(s[line][:len(s[line])-2],file=f2)
+        f1.close()
+        f2.close()
+        L=1200
+        W=800
+        wtf=0
+        queue=[]
+        lvl=[]
+        prlvl=[]
+        data=[]
+        used=[]
+        dfc=pd.read_csv('Output.csv')
+        dfc.sort_values(by="Height",inplace=True,ascending=False)
+        for i in range(dfc['SKU'].count()):
+            for j in range(dfc['Quantity'].iloc[i]-1):
+                if (j>0): dfc.append(dfc.iloc[i])
+        j=dfc['SKU'].count()-1
+        i=0
+        dfc = dfc.assign(Surface=pd.Series(dfc['Length']*dfc['Width']))
+        dfc = dfc.assign(Volume=pd.Series(dfc['Length']*dfc['Width']*dfc['Height']))
+        volume=dfc['Volume'].sum()
+        dfc.sort_values(by="Height",inplace=True,ascending=False)
+        for i in range(dfc['SKU'].count()):
+            used.append(-1)
+            data.append([[0,0,0],[0,0,0]])
+        place(0,0,0)
+        f3=open('COS-TEST-{0}-out.csv'.format(num),'w')
+        for i in range(len(used)):
+            print(dfc['SKU'].iloc[i],data[i][0][0],data[i][0][1],data[i][0][2],data[i][1][0],data[i][1][1],data[i][1][2],dfc['Aisle'].iloc[i],dfc['Mass'].iloc[i],sep=",",file=f3)
+        f3.close()
 
